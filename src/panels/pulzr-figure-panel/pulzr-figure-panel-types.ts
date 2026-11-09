@@ -19,6 +19,18 @@ export interface PulzrFigurePanelOptions {
    * series holding the total (the query asks for both); `label` follows.
    */
   of?: { series: string; label?: string };
+  /**
+   * A line under the title, from the query's series: `of {{booked_space_hours}} booked hours, occupied`. `{{name}}` is
+   * the series' value, `{{name|%}}` the value as a percent (16.4%).
+   */
+  subtitle?: string;
+  /** A small box under the figure, from the query's series as `subtitle` is: `{{new}} new · {{renewals}} renewals`. */
+  detail?: string;
+  /**
+   * How the change reads. `signed` (the default): `↑ +0.7% vs last week`, flat within half a percent. `size`: `↑ 35.8%
+   * vs last week`, whole past 100%, `0%` within a twentieth of one.
+   */
+  changeStyle?: 'signed' | 'size';
 }
 
 export type PulzrFigurePanelProps = PanelProps<PulzrFigurePanelOptions, TimeSeriesData>;

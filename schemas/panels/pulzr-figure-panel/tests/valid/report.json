@@ -1,0 +1,9 @@
+{
+  "kind": "PulzrFigurePanel",
+  "spec": {
+    "format": { "unit": "usd" },
+    "changeStyle": "size",
+    "subtitle": "of {{bookings}} bookings",
+    "detail": "{{new}} new · {{renewals}} renewals"
+  }
+}

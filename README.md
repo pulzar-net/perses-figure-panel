@@ -20,6 +20,8 @@ spec:
 - With nothing to compare with (no compared series, or zero before), `caption` shows instead, if set.
 - `color` colors the figure; the theme's text color without it.
 - `timeInParts` says a time as people do, `6h 46m` rather than `6.8h`, when `format` is in seconds, minutes or hours.
+- `subtitle` is a line under the title and `detail` a small box under the figure, each filled from the query's series: `{{name}}` is that series' value, `{{name|%}}` the value as a percent. `of {{booked_space_hours}} booked hours, occupied`.
+- `changeStyle: size` reads the change as its size, `↑ 35.8% vs previous period`: whole past 100%, `0%` within a twentieth of one, colored by good or bad news. The default, `signed`, is `↑ +0.7% vs last week`, flat within half a percent.
 - `of: {series, label}` shows a rate as a count of a total beside it, `1690/2639 Spaces Occupied`: the total is the last value of the series named `series`, which the same query asks for (for example `measures: [peak_rate, spaces]`).
 
 ## Install

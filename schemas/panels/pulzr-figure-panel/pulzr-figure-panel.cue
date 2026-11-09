@@ -22,4 +22,10 @@ spec: close({
 		series: string & !=""
 		label?: string
 	})
+	// A line under the title from the query's series: "of {{booked_space_hours}} booked hours".
+	subtitle?: string & !=""
+	// A small box under the figure, from the query's series.
+	detail?: string & !=""
+	// How the change reads: "↑ +0.7%" (signed) or "↑ 35.8%" (size).
+	changeStyle?: "signed" | "size"
 })

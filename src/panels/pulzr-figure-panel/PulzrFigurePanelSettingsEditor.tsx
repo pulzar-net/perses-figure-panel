@@ -1,4 +1,4 @@
-import { FormControlLabel, Switch, TextField } from '@mui/material';
+import { FormControlLabel, MenuItem, Switch, TextField } from '@mui/material';
 import { FormatControls, OptionsEditorColumn, OptionsEditorGrid, OptionsEditorGroup } from '@perses-dev/components';
 import type { OptionsEditorProps } from '@perses-dev/plugin-system';
 import type { ReactElement } from 'react';
@@ -44,6 +44,30 @@ export function PulzrFigurePanelSettingsEditor({
             value={value.caption ?? ''}
             onChange={(e) => onChange({ ...value, caption: text(e.target.value) })}
           />
+          <TextField
+            size="small"
+            label="Subtitle"
+            helperText="Under the title. {{series}}, {{series|%}}."
+            value={value.subtitle ?? ''}
+            onChange={(e) => onChange({ ...value, subtitle: text(e.target.value) })}
+          />
+          <TextField
+            size="small"
+            label="Detail"
+            helperText="A box under the figure, as the subtitle."
+            value={value.detail ?? ''}
+            onChange={(e) => onChange({ ...value, detail: text(e.target.value) })}
+          />
+          <TextField
+            select
+            size="small"
+            label="Change reads"
+            value={value.changeStyle ?? 'signed'}
+            onChange={(e) => onChange({ ...value, changeStyle: e.target.value === 'size' ? 'size' : undefined })}
+          >
+            <MenuItem value="signed">↑ +0.7%</MenuItem>
+            <MenuItem value="size">↑ 0.7%</MenuItem>
+          </TextField>
           <FormControlLabel
             control={
               <Switch

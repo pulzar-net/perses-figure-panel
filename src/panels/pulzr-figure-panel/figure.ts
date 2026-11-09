@@ -33,13 +33,16 @@ export function figureOf(
 
 const TO_MINUTES: Record<string, number> = { seconds: 1 / 60, minutes: 1, hours: 60 };
 
-/** A time in parts, as people say it: 45m, 6h 46m, 7h, 2d 3h. Undefined for a unit that is not a time. */
+/**
+ * A time in parts, as people say it: 45m, 6h 46m, 7h, and past two days 2d 3h, the minutes being noise there.
+ * Undefined for a unit that is not a time.
+ */
 export function timeInParts(value: number, unit: string | undefined): string | undefined {
   const per = unit ? TO_MINUTES[unit] : undefined;
   if (per === undefined) return undefined;
   const minutes = Math.round(value * per);
   if (minutes < 60) return `${minutes}m`;
-  if (minutes < 24 * 60) {
+  if (minutes < 48 * 60) {
     const h = Math.floor(minutes / 60);
     const m = minutes % 60;
     return m ? `${h}h ${m}m` : `${h}h`;
@@ -73,4 +76,40 @@ export function changeText(
 ): string {
   const sign = change.percent > 0 ? '+' : '';
   return `${ARROW[change.direction]} ${sign}${change.percent.toFixed(1)}% ${comparedLabel}`;
+}
+
+/** The last value of each series not labelled `compare`, by its formatted name. */
+export function valuesOf(results: Array<{ data?: TimeSeriesData }>): Map<string, number> {
+  const values = new Map<string, number>();
+  for (const s of results.flatMap((r) => r.data?.series ?? [])) {
+    if (s.labels?.compare) continue;
+    const v = lastValue(s);
+    if (v !== undefined) values.set(s.formattedName ?? s.name, v);
+  }
+  return values;
+}
+
+/** A template's `{{name}}` and `{{name|%}}` filled from the series' values; `—` for one with none. */
+export function fill(template: string, values: Map<string, number>): string {
+  return template.replace(/\{\{\s*([^}|]+?)\s*(\|\s*%\s*)?\}\}/g, (_, name: string, percent?: string) => {
+    const v = values.get(name);
+    if (v === undefined) return '—';
+    return percent ? `${v.toFixed(1)}%` : v.toLocaleString(undefined, { maximumFractionDigits: 1 });
+  });
+}
+
+export type Tone = 'good' | 'bad' | 'flat';
+
+/** The change as its size, good or bad news: `↑ 35.8%`, whole past 100%, `0%` within a twentieth of one. */
+export function sizeChange(
+  now: number | undefined,
+  before: number | undefined,
+  lowerIsBetter = false,
+): { text: string; tone: Tone } | undefined {
+  if (now === undefined || before === undefined || before === 0) return undefined;
+  const percent = ((now - before) / Math.abs(before)) * 100;
+  if (Math.abs(percent) < 0.05) return { text: '0%', tone: 'flat' };
+  const size = Math.abs(percent) >= 100 ? String(Math.round(Math.abs(percent))) : Math.abs(percent).toFixed(1);
+  const good = lowerIsBetter ? percent < 0 : percent > 0;
+  return { text: `${percent > 0 ? '↑' : '↓'} ${size}%`, tone: good ? 'good' : 'bad' };
 }

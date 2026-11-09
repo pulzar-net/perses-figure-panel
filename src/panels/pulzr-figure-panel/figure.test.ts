@@ -1,6 +1,6 @@
 import type { TimeSeriesData } from '@perses-dev/spec';
 
-import { changeOf, changeText, figureOf, lastValue, timeInParts } from './figure';
+import { changeOf, changeText, figureOf, fill, lastValue, sizeChange, timeInParts, valuesOf } from './figure';
 
 const data = (...series: TimeSeriesData['series']): { data: TimeSeriesData } => ({ data: { series } });
 
@@ -87,11 +87,50 @@ describe('timeInParts', () => {
     expect(timeInParts(420, 'minutes')).toBe('7h');
     expect(timeInParts(3, 'hours')).toBe('3h');
     expect(timeInParts(3000, 'minutes')).toBe('2d 2h');
+    expect(timeInParts(26 * 60 + 5, 'minutes')).toBe('26h 5m');
     expect(timeInParts(90, 'seconds')).toBe('2m');
   });
 
   it('is nothing for a unit that is not a time', () => {
     expect(timeInParts(5, 'percent')).toBeUndefined();
     expect(timeInParts(5, undefined)).toBeUndefined();
+  });
+});
+
+describe('fill', () => {
+  const values = valuesOf([
+    data(
+      { name: 'bookings', values: [[1, 77]] },
+      { name: 'no_show_pct', values: [[1, 16.438]] },
+      { name: 'booked_space_hours', values: [[1, 1309.27]] },
+      { name: 'bookings · previous period', labels: { compare: 'previous' }, values: [[1, 70]] },
+    ),
+  ]);
+
+  it('fills names with values and percents', () => {
+    expect(fill('{{no_show_pct|%}} of {{bookings}} bookings', values)).toBe('16.4% of 77 bookings');
+    expect(fill('of {{ booked_space_hours }} booked hours, occupied', values)).toBe(
+      'of 1,309.3 booked hours, occupied',
+    );
+  });
+
+  it('leaves out the period compared, and says — for a name with no value', () => {
+    expect(fill('{{late}} late', values)).toBe('— late');
+    expect(values.has('bookings · previous period')).toBe(false);
+  });
+});
+
+describe('sizeChange', () => {
+  it('reads as the reports have it', () => {
+    expect(sizeChange(13566, 9990)).toEqual({ text: '↑ 35.8%', tone: 'good' });
+    expect(sizeChange(119, 3)).toEqual({ text: '↑ 3867%', tone: 'good' });
+    expect(sizeChange(224, 97, true)).toEqual({ text: '↑ 131%', tone: 'bad' });
+    expect(sizeChange(5, 5.001)).toEqual({ text: '0%', tone: 'flat' });
+  });
+
+  it('is nothing without a period before, or from zero; a fall from below zero is still a fall', () => {
+    expect(sizeChange(1, undefined)).toBeUndefined();
+    expect(sizeChange(1, 0)).toBeUndefined();
+    expect(sizeChange(-2, -1)?.text).toBe('↓ 100%');
   });
 });
