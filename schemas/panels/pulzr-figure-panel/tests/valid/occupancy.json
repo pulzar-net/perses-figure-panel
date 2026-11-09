@@ -1,0 +1,10 @@
+{
+  "kind": "PulzrFigurePanel",
+  "spec": {
+    "format": { "unit": "percent-decimal", "decimalPlaces": 1 },
+    "color": "#10b981",
+    "comparedLabel": "vs last week",
+    "caption": "Average for the selected week",
+    "lowerIsBetter": false
+  }
+}

@@ -1,0 +1,8 @@
+{
+  "kind": "PulzrFigurePanel",
+  "spec": {
+    "format": { "unit": "percent-decimal" },
+    "color": "#ef4444",
+    "of": { "series": "Spaces", "label": "Spaces Occupied" }
+  }
+}
