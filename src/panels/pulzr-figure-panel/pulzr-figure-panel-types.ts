@@ -47,6 +47,8 @@ export interface PulzrFigureRow {
   format?: FormatOptions;
   lowerIsBetter?: boolean;
   timeInParts?: boolean;
+  /** Words after the value, `/ space / day`. */
+  suffix?: string;
 }
 
 export type PulzrFigurePanelProps = PanelProps<PulzrFigurePanelOptions, TimeSeriesData>;

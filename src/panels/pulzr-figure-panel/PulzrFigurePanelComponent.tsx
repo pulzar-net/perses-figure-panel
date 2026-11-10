@@ -273,6 +273,7 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
                   }}
                 >
                   {figure(pair.now, row.format, row.timeInParts)}
+                  {row.suffix && pair.now !== undefined && ` ${row.suffix}`}
                   <Badge now={pair.now} before={pair.before} lowerIsBetter={row.lowerIsBetter} />
                 </Box>
               </Box>

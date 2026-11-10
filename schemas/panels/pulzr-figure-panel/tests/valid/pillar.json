@@ -8,6 +8,12 @@
     "rows": [
       { "label": "Sessions", "series": "Sessions", "format": { "unit": "decimal", "decimalPlaces": 0 } },
       { "label": "Typical stay", "series": "Typical stay", "format": { "unit": "minutes" }, "timeInParts": true },
+      {
+        "label": "Turnover",
+        "series": "Turnover",
+        "format": { "unit": "decimal", "decimalPlaces": 1 },
+        "suffix": "/ space / day"
+      },
       { "label": "Violations", "series": "Violations", "lowerIsBetter": true }
     ]
   }

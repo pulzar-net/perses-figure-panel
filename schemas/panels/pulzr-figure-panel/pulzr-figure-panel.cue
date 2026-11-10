@@ -40,5 +40,6 @@ spec: close({
 		format?:        common.#format
 		lowerIsBetter?: bool
 		timeInParts?:   bool
+		suffix?:        string
 	})]
 })
