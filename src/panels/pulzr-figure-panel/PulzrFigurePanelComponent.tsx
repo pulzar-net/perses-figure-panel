@@ -54,7 +54,7 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
             textTransform: 'uppercase',
             color: 'text.secondary',
             mt: '-4px',
-            mb: '6px',
+            mb: '2px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
