@@ -1,0 +1,14 @@
+{
+  "kind": "PulzrFigurePanel",
+  "spec": {
+    "format": { "unit": "percent-decimal", "decimalPlaces": 1 },
+    "color": "#10b981",
+    "changeStyle": "badge",
+    "sparkline": { "series": "Occupancy by day" },
+    "rows": [
+      { "label": "Sessions", "series": "Sessions", "format": { "unit": "decimal", "decimalPlaces": 0 } },
+      { "label": "Typical stay", "series": "Typical stay", "format": { "unit": "minutes" }, "timeInParts": true },
+      { "label": "Violations", "series": "Violations", "lowerIsBetter": true }
+    ]
+  }
+}

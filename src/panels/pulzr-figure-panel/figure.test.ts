@@ -1,6 +1,18 @@
 import type { TimeSeriesData } from '@perses-dev/spec';
 
-import { changeOf, changeText, figureOf, fill, lastValue, sizeChange, timeInParts, valuesOf } from './figure';
+import {
+  BADGE_ARROWS,
+  changeOf,
+  changeText,
+  figureOf,
+  fill,
+  lastValue,
+  pairOf,
+  sizeChange,
+  timeInParts,
+  valuesOf,
+  valuesOver,
+} from './figure';
 
 const data = (...series: TimeSeriesData['series']): { data: TimeSeriesData } => ({ data: { series } });
 
@@ -77,6 +89,58 @@ describe('figureOf with a total', () => {
       ),
     ];
     expect(figureOf(results, 'Spaces')).toEqual({ now: 0.64, before: 0.21, total: 2639 });
+  });
+});
+
+describe('a pillar', () => {
+  const results = [
+    data(
+      { name: 'Sessions', values: [[1, 1200]] },
+      { name: 'Sessions · previous period', labels: { compare: 'previous' }, values: [[1, 960]] },
+      { name: 'Occupancy', values: [[1, 0.42]] },
+      { name: 'Occupancy · previous period', labels: { compare: 'previous' }, values: [[1, 0.18]] },
+      { name: 'Typical stay', values: [[1, 95]] },
+      { name: 'Typical stay · last year', labels: { compare: 'year' }, values: [[1, 100]] },
+    ),
+    data({
+      name: 'Occupancy by day',
+      values: [
+        [1, 0.3],
+        [2, null],
+        [3, 0.5],
+      ],
+    }),
+  ];
+
+  it('picks the figure from the series no row or sparkline names, and its own period before', () => {
+    expect(figureOf(results, undefined, ['Occupancy by day', 'Sessions', 'Typical stay'])).toEqual({
+      now: 0.42,
+      before: 0.18,
+    });
+  });
+
+  it('pairs each compared series by name, not the first compared', () => {
+    const [sessions, sessionsBefore, occupancy, occupancyBefore] = results[0]!.data.series;
+    expect(figureOf([data(occupancy!, sessions!, sessionsBefore!, occupancyBefore!)])).toEqual({
+      now: 0.42,
+      before: 0.18,
+    });
+  });
+
+  it('reads a row as its series and its twin, from either period compared', () => {
+    expect(pairOf(results, 'Sessions')).toEqual({ now: 1200, before: 960 });
+    expect(pairOf(results, 'Typical stay')).toEqual({ now: 95, before: 100 });
+    expect(pairOf(results, 'Longest stay')).toEqual({ now: undefined, before: undefined });
+  });
+
+  it('draws a sparkline from every number of its series', () => {
+    expect(valuesOver(results, 'Occupancy by day')).toEqual([0.3, 0.5]);
+    expect(valuesOver(results, 'Nothing')).toEqual([]);
+  });
+
+  it('reads the change as a badge', () => {
+    expect(sizeChange(119, 51, false, BADGE_ARROWS)).toEqual({ text: '↗ 133%', tone: 'good' });
+    expect(sizeChange(0.9, 1.2, true, BADGE_ARROWS)).toEqual({ text: '↘ 25.0%', tone: 'good' });
   });
 });
 

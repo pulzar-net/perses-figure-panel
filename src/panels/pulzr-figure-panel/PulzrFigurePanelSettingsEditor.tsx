@@ -63,11 +63,39 @@ export function PulzrFigurePanelSettingsEditor({
             size="small"
             label="Change reads"
             value={value.changeStyle ?? 'signed'}
-            onChange={(e) => onChange({ ...value, changeStyle: e.target.value === 'size' ? 'size' : undefined })}
+            onChange={(e) =>
+              onChange({
+                ...value,
+                changeStyle: e.target.value === 'size' || e.target.value === 'badge' ? e.target.value : undefined,
+              })
+            }
           >
             <MenuItem value="signed">↑ +0.7%</MenuItem>
             <MenuItem value="size">↑ 0.7%</MenuItem>
+            <MenuItem value="badge">↗ 0.7% beside the figure</MenuItem>
           </TextField>
+          <TextField
+            size="small"
+            label="Sparkline series"
+            helperText="An area under the figure, of this series over time."
+            value={value.sparkline?.series ?? ''}
+            onChange={(e) =>
+              onChange({
+                ...value,
+                sparkline: text(e.target.value) ? { ...value.sparkline, series: e.target.value } : undefined,
+              })
+            }
+          />
+          <TextField
+            size="small"
+            label="Sparkline color"
+            helperText="Empty: the figure's color."
+            disabled={!value.sparkline}
+            value={value.sparkline?.color ?? ''}
+            onChange={(e) =>
+              value.sparkline && onChange({ ...value, sparkline: { ...value.sparkline, color: text(e.target.value) } })
+            }
+          />
           <FormControlLabel
             control={
               <Switch

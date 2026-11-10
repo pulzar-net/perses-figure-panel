@@ -28,9 +28,25 @@ export interface PulzrFigurePanelOptions {
   detail?: string;
   /**
    * How the change reads. `signed` (the default): `↑ +0.7% vs last week`, flat within half a percent. `size`: `↑ 35.8%
-   * vs last week`, whole past 100%, `0%` within a twentieth of one.
+   * vs last week`, whole past 100%, `0%` within a twentieth of one. `badge`: `↗ 133%`, small beside the figure, sized
+   * as `size`, without the compared label, the figure bold as a pillar's.
    */
-  changeStyle?: 'signed' | 'size';
+  changeStyle?: 'signed' | 'size' | 'badge';
+  /** An area under the figure, of every value over time of the series named. `color` is the figure's unless set. */
+  sparkline?: { series: string; color?: string };
+  /**
+   * A list of figures under the figure (and its sparkline): each the last value of the series named, and its change
+   * as a badge against that series' twin, `<series> · previous period` or `· last year`.
+   */
+  rows?: PulzrFigureRow[];
+}
+
+export interface PulzrFigureRow {
+  label: string;
+  series: string;
+  format?: FormatOptions;
+  lowerIsBetter?: boolean;
+  timeInParts?: boolean;
 }
 
 export type PulzrFigurePanelProps = PanelProps<PulzrFigurePanelOptions, TimeSeriesData>;

@@ -22,7 +22,28 @@ spec:
 - `timeInParts` says a time as people do, `6h 46m` rather than `6.8h`, when `format` is in seconds, minutes or hours.
 - `subtitle` is a line under the title and `detail` a small box under the figure, each filled from the query's series: `{{name}}` is that series' value, `{{name|%}}` the value as a percent. `of {{booked_space_hours}} booked hours, occupied`.
 - `changeStyle: size` reads the change as its size, `↑ 35.8% vs previous period`: whole past 100%, `0%` within a twentieth of one, colored by good or bad news. The default, `signed`, is `↑ +0.7% vs last week`, flat within half a percent.
+- `changeStyle: badge` puts the change small beside the figure, `↗ 133%`, sized as `size` and colored by good or bad news, with no compared label; the figure is bold, as on the console's Overview cards. `caption` shows under it when there is nothing to compare with.
+- `sparkline: {series, color}` draws an area under the figure, 32px high, of every value over time of the series named (any query of the panel, for example one by day); `color` is the figure's unless set.
+- `rows` lists figures under the figure, each a line: `label` on the left, on the right the last value of the series named `series`, formatted by its `format` (and `timeInParts`), and its change as a badge against that series' twin, `<series> · previous period` or `<series> · last year`, when there is one (`lowerIsBetter` per row).
+- The figure is the first series that is neither the sparkline's nor a row's, and its period before is its own twin by name (`<figure> · previous period`), so one query can ask for several measures compared.
 - `of: {series, label}` shows a rate as a count of a total beside it, `1690/2639 Spaces Occupied`: the total is the last value of the series named `series`, which the same query asks for (for example `measures: [peak_rate, spaces]`).
+
+A pillar, as the Overview has them:
+
+```yaml
+spec:
+  plugin:
+    kind: PulzrFigurePanel
+    spec:
+      format: { unit: percent-decimal, decimalPlaces: 1 }
+      color: '#10b981'
+      changeStyle: badge
+      sparkline: { series: Occupancy by day }
+      rows:
+        - { label: Sessions, series: Sessions, format: { unit: decimal, decimalPlaces: 0 } }
+        - { label: Typical stay, series: Typical stay, format: { unit: minutes }, timeInParts: true }
+        - { label: Turnover, series: Turnover, format: { unit: decimal, decimalPlaces: 1 } }
+```
 
 ## Install
 

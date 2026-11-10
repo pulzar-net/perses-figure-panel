@@ -26,6 +26,19 @@ spec: close({
 	subtitle?: string & !=""
 	// A small box under the figure, from the query's series.
 	detail?: string & !=""
-	// How the change reads: "↑ +0.7%" (signed) or "↑ 35.8%" (size).
-	changeStyle?: "signed" | "size"
+	// How the change reads: "↑ +0.7%" (signed), "↑ 35.8%" (size) or "↗ 133%" beside the figure (badge).
+	changeStyle?: "signed" | "size" | "badge"
+	// An area under the figure, of every value over time of the series named.
+	sparkline?: close({
+		series: string & !=""
+		color?:  string & !=""
+	})
+	// Figures listed under the figure, each a series' last value and its change against its twin.
+	rows?: [...close({
+		label:          string & !=""
+		series:         string & !=""
+		format?:        common.#format
+		lowerIsBetter?: bool
+		timeInParts?:   bool
+	})]
 })
