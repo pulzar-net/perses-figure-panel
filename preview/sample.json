@@ -1,0 +1,119 @@
+{
+ "$schema": "https://raw.githubusercontent.com/pulzar-net/perses-panel-preview/main/sample.schema.json",
+ "timeRange": {
+  "start": "2026-01-07T00:00:00Z",
+  "end": "2026-01-14T00:00:00Z"
+ },
+ "panel": {
+  "kind": "Panel",
+  "spec": {
+   "display": {
+    "name": "Occupancy"
+   },
+   "plugin": {
+    "kind": "PulzrFigurePanel",
+    "spec": {
+     "format": {
+      "unit": "percent-decimal",
+      "decimalPlaces": 1
+     },
+     "color": "#10b981",
+     "changeStyle": "badge",
+     "rows": [
+      {
+       "label": "Sessions",
+       "series": "Sessions",
+       "format": {
+        "unit": "decimal",
+        "decimalPlaces": 0,
+        "shortValues": false
+       }
+      },
+      {
+       "label": "Typical stay",
+       "series": "Typical stay",
+       "format": {
+        "unit": "minutes"
+       },
+       "timeInParts": true
+      },
+      {
+       "label": "Turnover",
+       "series": "Turnover",
+       "format": {
+        "unit": "decimal",
+        "decimalPlaces": 1
+       }
+      }
+     ]
+    }
+   }
+  }
+ },
+ "queries": [
+  {
+   "series": [
+    {
+     "name": "Occupancy",
+     "points": [
+      0.742
+     ]
+    },
+    {
+     "name": "Occupancy \u00b7 previous period",
+     "labels": {
+      "compare": "previous period"
+     },
+     "points": [
+      0.708
+     ]
+    },
+    {
+     "name": "Sessions",
+     "points": [
+      1284
+     ]
+    },
+    {
+     "name": "Sessions \u00b7 previous period",
+     "labels": {
+      "compare": "previous period"
+     },
+     "points": [
+      1190
+     ]
+    },
+    {
+     "name": "Typical stay",
+     "points": [
+      96
+     ]
+    },
+    {
+     "name": "Typical stay \u00b7 previous period",
+     "labels": {
+      "compare": "previous period"
+     },
+     "points": [
+      101
+     ]
+    },
+    {
+     "name": "Turnover",
+     "points": [
+      2.4
+     ]
+    },
+    {
+     "name": "Turnover \u00b7 previous period",
+     "labels": {
+      "compare": "previous period"
+     },
+     "points": [
+      2.2
+     ]
+    }
+   ]
+  }
+ ]
+}

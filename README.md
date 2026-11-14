@@ -1,5 +1,10 @@
 # Figure panel for Perses
 
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset="https://github.com/pulzar-net/perses-figure-panel/releases/latest/download/preview-dark.png">
+  <img alt="The PulzrFigurePanel: occupancy as a figure with its change, a sparkline under it and rows of sessions, typical stay and turnover" src="https://github.com/pulzar-net/perses-figure-panel/releases/latest/download/preview-light.png">
+</picture>
+
 `PulzrFigurePanel` draws one figure, large and light, and under it how it changed against the period before: `↓ -47.3% vs last week`, in the theme's success or error color. A dashboard's headline row: average occupancy, sessions, revenue.
 
 ```yaml
