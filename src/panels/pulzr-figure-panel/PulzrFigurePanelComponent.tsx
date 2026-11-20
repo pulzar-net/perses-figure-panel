@@ -1,4 +1,5 @@
-import { Box, Typography, useTheme } from '@mui/material';
+import type { SxProps, Theme } from '@mui/material';
+import { Box, Typography, alpha, useTheme } from '@mui/material';
 import type { FormatOptions } from '@perses-dev/components';
 import { EChart, formatValue, useChartsTheme } from '@perses-dev/components';
 import { LineChart } from 'echarts/charts';
@@ -32,7 +33,27 @@ function figure(now: number | undefined, format?: FormatOptions, inParts?: boole
   return (inParts && timeInParts(now, format?.unit)) || formatValue(now, format);
 }
 
-const TONE = { good: 'success.main', bad: 'error.main', flat: 'text.disabled' } as const;
+const TONE = { good: 'success.main', bad: 'error.main', flat: 'text.secondary' } as const;
+
+/** A change as a chip: its text in the tone's color on a soft tint of it, 12px, so a figure's news reads at a glance. */
+function chipSx(tone: keyof typeof TONE): SxProps<Theme> {
+  return {
+    ...numbers,
+    display: 'inline-flex',
+    alignItems: 'center',
+    height: 20,
+    px: '7px',
+    borderRadius: 999,
+    fontSize: 12,
+    fontWeight: 600,
+    lineHeight: 1,
+    letterSpacing: 0,
+    whiteSpace: 'nowrap',
+    color: TONE[tone],
+    bgcolor: (t: Theme) =>
+      tone === 'flat' ? t.palette.action.hover : alpha(tone === 'good' ? t.palette.success.main : t.palette.error.main, 0.14),
+  };
+}
 
 /** The change, small, as a pillar has it beside a figure: `↗ 133%`, good or bad news. Nothing with nothing before. */
 function Badge({
@@ -47,10 +68,7 @@ function Badge({
   const change = sizeChange(now, before, lowerIsBetter, BADGE_ARROWS);
   if (!change) return null;
   return (
-    <Typography
-      component="span"
-      sx={{ ...numbers, fontSize: 11, fontWeight: 600, whiteSpace: 'nowrap', color: TONE[change.tone] }}
-    >
+    <Typography component="span" sx={chipSx(change.tone)}>
       {change.text}
     </Typography>
   );
@@ -111,7 +129,7 @@ function changeLine(
   now: number | undefined,
   before: number | undefined,
   spec: PulzrFigurePanelProps['spec'],
-): { line?: string; lineColor: string } {
+): { line?: string; lineColor: string; chip?: { text: string; tone: keyof typeof TONE } } {
   const label = spec.comparedLabel ?? 'vs the period before';
   if (spec.changeStyle === 'badge') {
     return { line: sizeChange(now, before) ? undefined : spec.caption, lineColor: 'text.secondary' };
@@ -119,7 +137,7 @@ function changeLine(
   if (spec.changeStyle === 'size') {
     const change = sizeChange(now, before, spec.lowerIsBetter);
     return change
-      ? { line: `${change.text} ${label}`, lineColor: TONE[change.tone] }
+      ? { line: label, lineColor: 'text.secondary', chip: change }
       : { line: spec.caption, lineColor: 'text.secondary' };
   }
   const change = changeOf(now, before);
@@ -130,7 +148,7 @@ function changeLine(
 }
 
 /**
- * One figure, large and light, and under it its change against the period before (or a caption); as a pillar, bold
+ * One figure, large and bold in the text color, and under it its change against the period before (or a caption); as a pillar, bold
  * with its change beside it, a sparkline and a list of figures under it.
  */
 export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePanelProps): ReactElement {
@@ -138,7 +156,7 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
   const others = [...(spec.sparkline ? [spec.sparkline.series] : []), ...(spec.rows ?? []).map((r) => r.series)];
   const { now, before, total } = figureOf(queryResults, spec.of?.series, others);
   const values = spec.subtitle || spec.detail ? valuesOf(queryResults) : undefined;
-  const { line, lineColor } = changeLine(now, before, spec);
+  const { line, lineColor, chip } = changeLine(now, before, spec);
   const badge = spec.changeStyle === 'badge';
   return (
     <Box sx={{ px: '10px', pt: '2px', pb: '7px', minWidth: 0, overflow: 'hidden' }}>
@@ -146,11 +164,10 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
         <Typography
           component="div"
           sx={{
-            fontSize: 9,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
+            fontSize: 12,
+            lineHeight: '16px',
             color: 'text.secondary',
-            mt: '-4px',
+            mt: '-2px',
             mb: '2px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
@@ -164,10 +181,11 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
         component="div"
         sx={{
           ...numbers,
-          fontSize: 22,
-          ...(badge
-            ? { fontWeight: 650, lineHeight: 1.1, display: 'flex', alignItems: 'baseline', gap: '8px' }
-            : { fontWeight: 300, lineHeight: 1.05, letterSpacing: '-0.02em' }),
+          fontSize: 28,
+          fontWeight: 700,
+          lineHeight: '32px',
+          letterSpacing: '-0.01em',
+          ...(badge ? { display: 'flex', alignItems: 'center', gap: '8px' } : {}),
           mb: '4px',
           color: spec.color ?? 'text.primary',
         }}
@@ -180,7 +198,7 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
               ...numbers,
               fontSize: 13,
               fontWeight: 400,
-              letterSpacing: '0.02em',
+              letterSpacing: 0,
               color: 'text.secondary',
               ml: badge ? 0 : '8px',
               whiteSpace: 'nowrap',
@@ -196,18 +214,24 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
           component="div"
           sx={{
             ...numbers,
-            fontSize: 10,
-            fontWeight: 500,
-            lineHeight: 1.4,
-            letterSpacing: '0.02em',
-            textTransform: 'uppercase',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '6px',
+            fontSize: 12,
+            fontWeight: chip ? 400 : 500,
+            lineHeight: '20px',
             whiteSpace: 'nowrap',
             overflow: 'hidden',
             textOverflow: 'ellipsis',
             color: lineColor,
           }}
         >
-          {line}
+          {chip && (
+            <Typography component="span" sx={chipSx(chip.tone)}>
+              {chip.text}
+            </Typography>
+          )}
+          <span style={{ overflow: 'hidden', textOverflow: 'ellipsis' }}>{line}</span>
         </Typography>
       )}
       {spec.detail && values && (
@@ -215,19 +239,11 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
           component="div"
           sx={{
             ...numbers,
-            display: 'inline-block',
-            fontSize: 9,
-            fontWeight: 500,
-            lineHeight: 1.4,
-            letterSpacing: '0.04em',
-            textTransform: 'uppercase',
+            fontSize: 12,
+            fontWeight: 400,
+            lineHeight: '16px',
             color: 'text.secondary',
-            mt: '5px',
-            px: '6px',
-            py: '2px',
-            bgcolor: 'action.hover',
-            border: 1,
-            borderColor: 'divider',
+            mt: '4px',
           }}
         >
           {fill(spec.detail, values)}
@@ -248,10 +264,10 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
                 key={row.label}
                 sx={{
                   display: 'flex',
-                  alignItems: 'baseline',
+                  alignItems: 'center',
                   justifyContent: 'space-between',
                   gap: '10px',
-                  py: '3px',
+                  py: '4px',
                   borderTop: 1,
                   borderColor: 'divider',
                   fontSize: 12,
@@ -265,7 +281,7 @@ export function PulzrFigurePanelComponent({ queryResults, spec }: PulzrFigurePan
                   sx={{
                     ...numbers,
                     display: 'inline-flex',
-                    alignItems: 'baseline',
+                    alignItems: 'center',
                     gap: '6px',
                     m: 0,
                     color: 'text.primary',
